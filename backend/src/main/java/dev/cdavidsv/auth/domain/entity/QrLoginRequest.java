@@ -1,4 +1,4 @@
-package domain.entity;
+package dev.cdavidsv.auth.domain.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,9 +14,9 @@ public class QrLoginRequest {
     public QrLoginRequest() {
     }
 
-    public QrLoginRequest(UUID id, String code_hash, QrLoginStatus status, Instant createdAt, Instant expiresAt, Instant approvedAt) {
+    public QrLoginRequest(UUID id, String codeHash, QrLoginStatus status, Instant createdAt, Instant expiresAt, Instant approvedAt) {
         this.id = id;
-        this.code_hash = code_hash;
+        this.codeHash = codeHash;
         this.status = status;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
@@ -29,7 +29,7 @@ public class QrLoginRequest {
     private UUID id;
 
     @Column(name="code_hash", nullable = false, unique = true)
-    private String code_hash;
+    private String codeHash;
 
     @Column(name="status", nullable = false)
     private QrLoginStatus status;
@@ -52,12 +52,12 @@ public class QrLoginRequest {
         this.id = id;
     }
 
-    public String getCode_hash() {
-        return code_hash;
+    public String getCodeHash() {
+        return codeHash;
     }
 
-    public void setCode_hash(String code_hash) {
-        this.code_hash = code_hash;
+    public void setCodeHash(String codeHash) {
+        this.codeHash = codeHash;
     }
 
     public QrLoginStatus getStatus() {
@@ -108,7 +108,7 @@ public class QrLoginRequest {
     public String toString() {
         return "QrLoginRequest{" +
                 "id=" + id +
-                ", code_hash='" + code_hash + '\'' +
+                ", code_hash='" + codeHash + '\'' +
                 ", status=" + status +
                 ", createdAt=" + createdAt +
                 ", expiresAt=" + expiresAt +

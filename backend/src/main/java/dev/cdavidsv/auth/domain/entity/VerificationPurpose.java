@@ -1,4 +1,4 @@
-package domain.entity;
+package dev.cdavidsv.auth.domain.entity;
 
 public enum VerificationPurpose {
     LOGIN_2FA,

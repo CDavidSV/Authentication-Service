@@ -1,4 +1,4 @@
-package domain.entity;
+package dev.cdavidsv.auth.domain.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
