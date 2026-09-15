@@ -10,8 +10,6 @@ erDiagram
         text email UK "Unique login identifier"
         text username UK "Unique display handle"
         text password_hash "Argon2/bcrypt hash"
-        text phone_number UK "E.164 format"
-        boolean phone_number_verified
         boolean email_verified
         user_status status "ACTIVE, SUSPENDED, DEACTIVATED"
         timestamptz created_at
@@ -41,7 +39,6 @@ erDiagram
         verification_purpose purpose "LOGIN_2FA, EMAIL_VERIFICATION, etc."
         text destination "Email or phone the code was sent to"
         text code_hash
-        integer attempts
         timestamptz created_at
         timestamptz expires_at
         timestamptz consumed_at
@@ -51,11 +48,10 @@ erDiagram
         uuid id PK
         uuid session_id FK
         text code_hash
-        qr_login_status status "PENDING, APPROVED, DENIED, EXPIRED, CONSUMED"
+        qr_login_status status "PENDING, APPROVED, DENIED, EXPIRED"
         timestamptz created_at
         timestamptz expires_at
         timestamptz approved_at
-        timestamptz consumed_at
     }
 
     AUDIT_LOG {
