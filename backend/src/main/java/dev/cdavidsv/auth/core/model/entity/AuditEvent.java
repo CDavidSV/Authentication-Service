@@ -1,4 +1,4 @@
-package dev.cdavidsv.auth.domain.entity;
+package dev.cdavidsv.auth.core.model.entity;
 
 public enum AuditEvent {
     LOGIN,

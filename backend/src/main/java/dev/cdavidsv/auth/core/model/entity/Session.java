@@ -1,10 +1,9 @@
-package dev.cdavidsv.auth.domain.entity;
+package dev.cdavidsv.auth.core.model.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.net.Inet4Address;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,52 +13,60 @@ import java.util.UUID;
 public class Session {
 
     public Session() {
+
     }
 
-    public Session(UUID id, User user, String refreshTokenHash, Inet4Address ipAddress, String deviceName, String os, String platform, String location, Instant createdAt, Instant updatedAt, Instant revokedAt) {
+    public Session(UUID id, User user, String previousRefreshTokenHash, String currentRefreshTokenHash, String ipAddress, String deviceName, String os, String platform, String location, Instant createdAt, Instant expiresAt, Instant updatedAt, Instant revokedAt) {
         this.id = id;
         this.user = user;
-        this.refreshTokenHash = refreshTokenHash;
+        this.previousRefreshTokenHash = previousRefreshTokenHash;
+        this.currentRefreshTokenHash = currentRefreshTokenHash;
         this.ipAddress = ipAddress;
         this.deviceName = deviceName;
         this.os = os;
         this.platform = platform;
         this.location = location;
         this.createdAt = createdAt;
+        this.expiresAt = expiresAt;
         this.updatedAt = updatedAt;
         this.revokedAt = revokedAt;
     }
 
     @Id
     @Column(name="id", unique = true, nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, nullable = false)
     private User user;
 
-    @Column(name="refresh_token_hash", nullable = false, unique = true)
-    private String refreshTokenHash;
+    @Column(name="previous_refresh_token_hash", nullable = false, unique = true)
+    private String previousRefreshTokenHash;
+
+    @Column(name="current_refresh_token_hash", nullable = false, unique = true)
+    private String currentRefreshTokenHash;
 
     @Column(name="ip_address", nullable = false, updatable = false)
-    private Inet4Address ipAddress;
+    private String ipAddress;
 
-    @Column(name="device_name", nullable = false)
+    @Column(name="device_name")
     private String deviceName;
 
-    @Column(name="os", nullable = false)
+    @Column(name="os")
     private String os;
 
-    @Column(name="platform", nullable = false)
+    @Column(name="platform")
     private String platform;
 
-    @Column(name="location", nullable = false)
+    @Column(name="location")
     private String location;
 
     @Column(name="created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private Instant createdAt;
+
+    @Column(name="expires_at", nullable = false)
+    private Instant expiresAt;
 
     @Column(name="updated_at", nullable = false)
     @UpdateTimestamp
@@ -84,19 +91,27 @@ public class Session {
         this.user = user;
     }
 
-    public String getRefreshTokenHash() {
-        return refreshTokenHash;
+    public Instant getExpiresAt() {
+        return expiresAt;
     }
 
-    public void setRefreshTokenHash(String refreshTokenHash) {
-        this.refreshTokenHash = refreshTokenHash;
+    public void setExpiresAt(Instant expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
-    public Inet4Address getIpAddress() {
+    public String getCurrentRefreshTokenHash() {
+        return currentRefreshTokenHash;
+    }
+
+    public void setCurrentRefreshTokenHash(String currentRefreshTokenHash) {
+        this.currentRefreshTokenHash = currentRefreshTokenHash;
+    }
+
+    public String getIpAddress() {
         return ipAddress;
     }
 
-    public void setIpAddress(Inet4Address ipAddress) {
+    public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
@@ -156,6 +171,14 @@ public class Session {
         this.revokedAt = revokedAt;
     }
 
+    public String getPreviousRefreshTokenHash() {
+        return previousRefreshTokenHash;
+    }
+
+    public void setPreviousRefreshTokenHash(String previousRefreshTokenHash) {
+        this.previousRefreshTokenHash = previousRefreshTokenHash;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -173,7 +196,7 @@ public class Session {
         return "Session{" +
                 "id=" + id +
                 ", user=" + user +
-                ", refreshTokenHash='" + refreshTokenHash + '\'' +
+                ", refreshTokenHash='" + currentRefreshTokenHash + '\'' +
                 ", ipAddress=" + ipAddress +
                 ", deviceName='" + deviceName + '\'' +
                 ", os='" + os + '\'' +

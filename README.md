@@ -27,7 +27,7 @@ erDiagram
         text platform
         text location "Derived from IP geolocation"
         timestamptz created_at
-        timestamptz last_active_at
+        timestamptz updated_at
         timestamptz expires_at
         timestamptz revoked_at
     }

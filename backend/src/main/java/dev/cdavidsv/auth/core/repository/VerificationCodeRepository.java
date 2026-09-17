@@ -1,7 +1,7 @@
-package dev.cdavidsv.auth.repository;
+package dev.cdavidsv.auth.core.repository;
 
-import dev.cdavidsv.auth.domain.entity.VerificationChannel;
-import dev.cdavidsv.auth.domain.entity.VerificationCode;
+import dev.cdavidsv.auth.core.model.entity.VerificationChannel;
+import dev.cdavidsv.auth.core.model.entity.VerificationCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

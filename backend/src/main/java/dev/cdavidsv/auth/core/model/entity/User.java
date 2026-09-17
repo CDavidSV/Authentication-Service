@@ -1,4 +1,4 @@
-package dev.cdavidsv.auth.domain.entity;
+package dev.cdavidsv.auth.core.model.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,7 +31,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name= "email", nullable = false)
+    @Column(name= "email", nullable = false, unique = true)
     private String email;
 
     @Column(name="username", nullable = false, length = 30)

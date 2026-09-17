@@ -1,0 +1,12 @@
+package dev.cdavidsv.auth.core.exception;
+
+public enum ErrorCode {
+    INVALID_CREDENTIALS,
+    ACCOUNT_BLOCKED,
+    TOKEN_EXPIRED,
+    SESSION_EXPIRED,
+    INVALID_REFRESH_TOKEN,
+    UNAUTHORIZED_ACCESS,
+    VALIDATION_ERROR,
+    USER_ALREADY_REGISTERED,
+}

@@ -1,4 +1,4 @@
-package dev.cdavidsv.auth.domain.entity;
+package dev.cdavidsv.auth.core.model.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,10 +13,10 @@ public class VerificationCode {
     public VerificationCode() {
     }
 
-    public VerificationCode(UUID id, User user, VerificationChannel verificationChannel, VerificationPurpose verificationPurpose, String destination, String codeHash, Instant createdAt, Instant expiresAt, Instant consumedAt) {
+    public VerificationCode(UUID id, User user, VerificationChannel channel, VerificationPurpose verificationPurpose, String destination, String codeHash, Instant createdAt, Instant expiresAt, Instant consumedAt) {
         this.id = id;
         this.user = user;
-        this.verificationChannel = verificationChannel;
+        this.channel = channel;
         this.verificationPurpose = verificationPurpose;
         this.destination = destination;
         this.codeHash = codeHash;
@@ -36,7 +36,7 @@ public class VerificationCode {
 
     @Column(name="verification_channel", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private VerificationChannel verificationChannel;
+    private VerificationChannel channel;
 
     @Column(name="verification_purpose", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
@@ -74,12 +74,12 @@ public class VerificationCode {
         this.user = user;
     }
 
-    public VerificationChannel getVerificationChannel() {
-        return verificationChannel;
+    public VerificationChannel getChannel() {
+        return channel;
     }
 
-    public void setVerificationChannel(VerificationChannel verificationChannel) {
-        this.verificationChannel = verificationChannel;
+    public void setChannel(VerificationChannel channel) {
+        this.channel = channel;
     }
 
     public VerificationPurpose getVerificationPurpose() {
@@ -147,7 +147,7 @@ public class VerificationCode {
         return "VerificationCode{" +
                 "id=" + id +
                 ", user=" + user +
-                ", verificationChannel=" + verificationChannel +
+                ", channel=" + channel +
                 ", verificationPurpose=" + verificationPurpose +
                 ", destination='" + destination + '\'' +
                 ", codeHash='" + codeHash + '\'' +
