@@ -20,7 +20,8 @@ erDiagram
     SESSION {
         uuid id PK
         uuid user_id FK
-        text refresh_token_hash "Hashed, never store raw token"
+        text previous_refresh_token_hash "Hashed"
+        text current_refresh_token_hash "Hashed"
         inet ip_address
         text device_name
         text os
