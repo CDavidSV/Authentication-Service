@@ -1,7 +1,11 @@
 package dev.cdavidsv.auth.auth;
 
 import dev.cdavidsv.auth.auth.dto.*;
+import dev.cdavidsv.auth.core.exception.ResourceNotFoundException;
+import dev.cdavidsv.auth.core.exception.TicketNotFoundException;
+import dev.cdavidsv.auth.core.model.entity.MfaMethod;
 import dev.cdavidsv.auth.core.service.AuthenticationService;
+import dev.cdavidsv.auth.core.service.MfaService;
 import dev.cdavidsv.auth.core.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -19,8 +23,10 @@ import java.util.UUID;
 @RequestMapping("v1/auth")
 public class AuthController {
     private final AuthenticationService authenticationService;
+    private final MfaService mfaService;
 
-    public AuthController(AuthenticationService authenticationService) {
+    public AuthController(AuthenticationService authenticationService, MfaService mfaService) {
+        this.mfaService = mfaService;
         this.authenticationService = authenticationService;
     }
 
@@ -32,7 +38,7 @@ public class AuthController {
         String ip = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
 
-        AuthenticationService.AuthenticateResult result = authenticationService.registerUser(new AuthenticationService.RegisterUserRequest(
+        AuthenticationService.RegisterResponse result = authenticationService.registerUser(new AuthenticationService.RegisterUserRequest(
                 registerUserRequest.username(),
                 registerUserRequest.password(),
                 registerUserRequest.email(),
@@ -42,35 +48,48 @@ public class AuthController {
 
         AuthenticatedUserResponseDTO response = new AuthenticatedUserResponseDTO(
                 result.user().getId().toString(),
-                result.accessToken(),
-                result.refreshToken(),
-                result.expiresAt()
+                result.tokens().accessToken(),
+                result.tokens().refreshToken(),
+                result.tokens().expiresAt()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticatedUserResponseDTO> loginUser(
+    public ResponseEntity<?> loginUser(
         HttpServletRequest request,
         @Valid @RequestBody LoginUserRequestDTO loginUserRequest
     ) {
         String ip = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
 
-        AuthenticationService.AuthenticateResult result = authenticationService.authenticate(new AuthenticationService.AuthenticateUserRequest(
+        AuthenticationService.AuthenticationResult result = authenticationService.authenticate(new AuthenticationService.AuthenticateUserRequest(
                 loginUserRequest.email(),
                 loginUserRequest.password(),
                 ip,
                 userAgent
         ));
 
-        AuthenticatedUserResponseDTO response = new AuthenticatedUserResponseDTO(
-                result.user().getId().toString(),
-                result.accessToken(),
-                result.refreshToken(),
-                result.expiresAt()
-        );
-        return ResponseEntity.ok(response);
+        switch (result) {
+            case AuthenticationService.AuthenticationResult.Authenticated authenticated -> {
+                AuthenticatedUserResponseDTO response = new AuthenticatedUserResponseDTO(
+                        authenticated.userId(),
+                        authenticated.tokens().accessToken(),
+                        authenticated.tokens().refreshToken(),
+                        authenticated.tokens().expiresAt()
+                );
+                return ResponseEntity.ok(response);
+            }
+            case AuthenticationService.AuthenticationResult.MfaRequired mfaRequired -> {
+                MfaRequiredResponseDTO response = new MfaRequiredResponseDTO(
+                        mfaRequired.userId(),
+                        mfaRequired.ticket(),
+                        mfaRequired.loginReferenceId(),
+                        mfaRequired.methods()
+                );
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+        }
     }
 
     @PostMapping("/logout")
@@ -82,12 +101,33 @@ public class AuthController {
 
     @PostMapping("/token")
     public ResponseEntity<TokenRefreshResponseDTO> refreshToken(@Valid @RequestBody RefreshAccessTokenDTO tokenRequest) {
-        AuthenticationService.TokenRefreshResult result = authenticationService.refreshAccessToken(tokenRequest.refresh_token());
+        AuthenticationService.TokenPair result = authenticationService.refreshAccessToken(tokenRequest.refresh_token());
         TokenRefreshResponseDTO response = new TokenRefreshResponseDTO(
                 result.accessToken(),
                 result.refreshToken(),
                 result.expiresAt()
         );
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/sms/send")
+    public ResponseEntity<?> sendSmsMfaChallenge() {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+    }
+
+    @PostMapping("/email/send")
+    public ResponseEntity<Void> sendEmailMfaChallenge(@Valid @RequestBody SendEmailMfaChallengeRequestDTO request) {
+        try {
+            mfaService.challenge(UUID.fromString(request.user_id()), request.ticket(), MfaMethod.EMAIL);
+        } catch (TicketNotFoundException e) {
+            throw new ResourceNotFoundException();
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyMfaCode(@Valid @RequestBody VerifyMfaCodeRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }

@@ -58,7 +58,7 @@ public class TokenServiceImpl implements TokenService {
      */
     @Override
     public String generateRefreshToken() {
-        byte[] buf = new byte[32];
+        byte[] buf = new byte[64];
         secureRandom.nextBytes(buf);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(buf);
     }

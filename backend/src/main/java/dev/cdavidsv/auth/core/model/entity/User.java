@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class User {
     public User() {
     }
 
-    public User(UUID id, String email, String username, String passwordHash, boolean emailVerified, UserStatus status, Instant createdAt, Instant updatedAt, Instant deletedAt) {
+    public User(UUID id, String email, String username, String passwordHash, boolean emailVerified, UserStatus status, List<UserMfaMethod> mfaMethods, Instant createdAt, Instant updatedAt, Instant deletedAt) {
         this.id = id;
         this.email = email;
         this.username = username;
@@ -24,6 +25,7 @@ public class User {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
+        this.mfaMethods = mfaMethods;
     }
 
     @Id
@@ -46,6 +48,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name="status", nullable = false)
     private UserStatus status;
+
+    @OneToMany(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserMfaMethod> mfaMethods;
 
     @Column(name="created_at", nullable = false, updatable = false)
     @CreationTimestamp
@@ -104,6 +109,14 @@ public class User {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public List<UserMfaMethod> getMfaMethods() {
+        return mfaMethods;
+    }
+
+    public void setMfaMethods(List<UserMfaMethod> mfaMethods) {
+        this.mfaMethods = mfaMethods;
     }
 
     public Instant getCreatedAt() {

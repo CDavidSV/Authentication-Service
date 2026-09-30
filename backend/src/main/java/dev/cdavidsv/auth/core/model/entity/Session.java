@@ -40,10 +40,10 @@ public class Session {
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, nullable = false)
     private User user;
 
-    @Column(name="previous_refresh_token_hash", nullable = false, unique = true)
+    @Column(name="previous_refresh_token_hash", unique = true)
     private String previousRefreshTokenHash;
 
-    @Column(name="current_refresh_token_hash", nullable = false, unique = true)
+    @Column(name="current_refresh_token_hash", unique = true)
     private String currentRefreshTokenHash;
 
     @Column(name="ip_address", nullable = false, updatable = false)
